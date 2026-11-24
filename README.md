@@ -137,14 +137,6 @@ The main settings are constants at the top of `app2.py`:
 - Scanned PDFs (images only) have no readable text and are rejected. They would need OCR.
 - PDFs are indexed one at a time, and upload progress is kept in memory, so it is lost if the server restarts.
 
-## Deployment (Render)
-
-- **Build command:** `pip install -r requirements.txt`
-- **Start command:** `uvicorn app2:app --host 0.0.0.0 --port $PORT`
-- **Environment variable:** `GROQ_API_KEY`
-
-Notes: the free instance has limited RAM, which may be too small for the embedding model. Its disk is temporary, so the `ChromaDB` folder is reset on restart or redeploy unless you attach a persistent disk.
-
 ## Roadmap
 
 - [ ] Filter answers by selected document
