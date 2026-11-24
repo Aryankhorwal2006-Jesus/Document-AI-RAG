@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intelligent Document AI – RAG Chatbot</title>
+<script>try{var t=JSON.parse(localStorage.getItem("theme"));if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="icon" href="logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Sora:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+</defs></svg>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="logo.svg" alt="" width="30" height="30"><span>Document AI</span></div>
+    <button class="btn primary" id="newChat"><svg class="i"><use href="#i-plus"/></svg>New chat</button>
+    <section class="side-sec grow-sec"><h3>Chat history</h3><ul class="list" id="history"></ul></section>
+    <section class="side-sec">
+      <div class="sec-head"><h3>Uploaded documents</h3><button class="btn ghost sm" id="addPdf"><svg class="i"><use href="#i-plus"/></svg>Add PDF</button></div>
+      <ul class="list" id="docList"></ul>
+    </section>
+    <div class="side-foot">
+      <button class="row" id="settingsBtn"><svg class="i"><use href="#i-sliders"/></svg><span>Settings</span></button>
+      <button class="row" id="themeBtn"></button>
+      <div class="profile"><span class="avatar">You</span><div><b>Guest</b><small>Local workspace</small></div></div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="main">
+    <header class="top">
+      <button class="icon mobile-only" id="menuBtn" aria-label="Open menu"><svg class="i"><use href="#i-menu"/></svg></button>
+      <div class="status" id="status"><i></i><span>Checking backend…</span></div>
+      <button class="btn ghost sm" id="clearChat"><svg class="i"><use href="#i-trash"/></svg>Clear chat</button>
+    </header>
+
+    <div class="scroll" id="scroll">
+      <section class="welcome wrap" id="welcome">
+        <h1>Your Documents, Your AI Assistant.</h1>
+        <p>Upload your documents and ask anything.</p>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload a PDF">
+          <svg class="i big"><use href="#i-upload"/></svg>
+          <b>Drag and drop a PDF here</b>
+          <small>PDF only, up to 200 MB</small>
+          <button class="btn primary" id="browse" type="button">Browse files</button>
+        </div>
+      </section>
+      <div class="messages wrap" id="messages" aria-live="polite"></div>
+    </div>
+
+    <footer class="composer">
+      <div class="box wrap">
+        <textarea id="input" rows="1" placeholder="Ask anything about your uploaded documents…"></textarea>
+        <button id="send" aria-label="Send" disabled><svg class="i"><use href="#i-send"/></svg></button>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<input type="file" id="fileInput" accept="application/pdf,.pdf" multiple hidden>
+<div class="toasts" id="toasts"></div>
+
+<dialog id="settings">
+  <h2>Settings</h2>
+  <label for="apiUrl">Backend URL</label>
+  <input id="apiUrl" type="url" placeholder="http://127.0.0.1:8000">
+  <div class="dlg-actions"><button class="btn ghost" id="cancelSettings">Cancel</button><button class="btn primary" id="saveSettings">Save</button></div>
+</dialog>
+<script src="script.js"></script>
+</body>
+</html>
